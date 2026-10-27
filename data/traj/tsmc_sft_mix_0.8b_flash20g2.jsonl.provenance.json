@@ -1,0 +1,35 @@
+{
+  "schema": "provenance_v1",
+  "tool": "scripts/traj/build_substrate_mix.py",
+  "git": {
+    "sha": "6c03e597288e9e21bc5fbaf2301520e79475cc01",
+    "branch": "cleanup/v0.2.0",
+    "dirty": false
+  },
+  "argv": [
+    "--demos",
+    "data/traj/tsmc_sft_mix_flash20.jsonl",
+    "--keeps",
+    "data/traj/tsmc_0.8b_flash20g2_keeps.jsonl",
+    "--keeps-name",
+    "0.8b_g2_keeps",
+    "--out",
+    "data/traj/tsmc_sft_mix_0.8b_flash20g2.jsonl"
+  ],
+  "components": {
+    "mix_flash20": {
+      "path": "data/traj/tsmc_sft_mix_flash20.jsonl",
+      "rows": 39695
+    },
+    "0.8b_g2_keeps": {
+      "path": "data/traj/tsmc_0.8b_flash20g2_keeps.jsonl",
+      "rows": 69091
+    }
+  },
+  "shares": {
+    "mix_flash20": 0.3649,
+    "0.8b_g2_keeps": 0.6351
+  },
+  "seed": 0,
+  "rows_total": 108786
+}

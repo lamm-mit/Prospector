@@ -1,0 +1,36 @@
+# Stage 1: LoRA SFT from the base model on the teacher's demonstrations, the mix
+# `prospector teach` builds. Hyperparameters only: the base model, the rows and the
+# output directory come from --graph, --size and --tag (graph_reasoner.recipe).
+# batch_size 1 x grad_accum 32 is an effective batch of 32; the fp32 logits over
+# the vocabulary bound the per-device batch (launch/README.md).
+chat_template: plain_chatml
+
+matmul_precision: high
+
+# The ten modules the SFT stages adapt (the trainer's default); the GRPO rounds
+# adapt all-linear, which adds in_proj_a and in_proj_b.
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+  - in_proj_qkv
+  - in_proj_z
+  - out_proj
+
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+model_dtype: float32
+epochs: 3
+batch_size: 1
+grad_accum: 32
+lr: 1.0e-4
+max_length: 12288
+logging_steps: 10
+save_strategy: steps
+save_steps: 50
+seed: 0

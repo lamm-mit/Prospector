@@ -1,0 +1,50 @@
+# Benchmark build for the bio-inspired materials graph (bio-graph-1K): the
+# generator and tiers of tsmc_v0.yaml. Its nodes carry no bibliographic
+# types, so only the default name patterns mark such nodes, and its free-text
+# relations need `gold_leak_filter`.
+
+kg_path: data/raw/biograph/large_graph_simple_giant.graphml
+substrate: biograph      # backend and teacher persona (substrates/biograph/)
+seed: 20260824
+output: data/benchmarks/biograph/biograph_v0.jsonl
+
+teacher_model: gpt-5-mini
+
+# Nodes above this degree never enter a gold path.
+max_node_degree: 150
+
+# Keeps an edge off gold paths when its relation text contains an endpoint's
+# name, which would give the next hop away (kg/sample.py).
+gold_leak_filter: true
+
+# `biblio_types` is left out, so the defaults of kg/load.py apply.
+
+# `related to` is what the loader assigns to an edge with no usable relation,
+# so it is never a gold relation.
+gold_relation_blocklist: [related to, related_to, is related to]
+
+tiers:
+  easy:
+    n_items: 100
+    path_len: 2
+    branch_per_node: 1
+    branch_depth: 1
+    decoy_walks: 0
+    decoy_len: 0
+    biblio_attach: 0
+  medium:
+    n_items: 100
+    path_len: 3
+    branch_per_node: 2
+    branch_depth: 2
+    decoy_walks: 2
+    decoy_len: 3
+    biblio_attach: 2
+  hard:
+    n_items: 100
+    path_len: 4
+    branch_per_node: 3
+    branch_depth: 3
+    decoy_walks: 4
+    decoy_len: 4
+    biblio_attach: 4

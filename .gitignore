@@ -1,0 +1,62 @@
+# Secrets: never commit
+.env
+
+# Third-party documents, kept locally and not redistributed
+docs/literature/
+
+# Large data and outputs. data/raw/README.md, the one tracked file there, says
+# how to fetch each graph.
+data/raw/*
+!data/raw/README.md
+data/runs/
+data/cache/
+models/
+# Question files: each graph's evaluation questions and the training questions
+# are tracked. Everything else a script writes beside them is a build product:
+# the two baselines' inputs and the raw and curated files of question
+# generation.
+data/benchmarks/*/*
+!data/benchmarks/*/*_core_agentic.jsonl
+!data/benchmarks/*/*_train_agentic*.jsonl
+
+# Run logs: prospector creates logs/ and every job it launches writes there
+logs/
+
+# Local analysis outputs, not part of the release
+data/analysis/
+
+# Training rows, rebuilt by the commands in README.md, "Training on your own graph". Only
+# the .provenance.json sidecar beside a file is tracked: the git state, the
+# arguments and the source runs it was built from.
+data/traj/*
+!data/traj/*.provenance.json
+
+# Python
+__pycache__/
+*.pyc
+.venv*/
+*.egg-info/
+build/
+dist/
+
+# Local tool settings
+.claude/
+
+# Editors / OS
+.vscode/
+.ipynb_checkpoints/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Test caches
+.pytest_cache/
+
+# The app's map cache (app/server.py), recomputed on first view
+app/cache/
+
+# compiled kernels pulled from a machine's uv cache, installed by setup.sh on the next one
+launch/wheels/
+
+# The app's screen recording: the GIF the README shows is committed, the source is not
+assets/*.mov

@@ -1,0 +1,47 @@
+# Stage 2: GRPO over whole episodes on the medium and hard training questions,
+# continuing from the stage-1 adapter. `informative_band` keeps a question that the
+# stage-1 policy's four sampled passes solve between 5% and 95% of the time; the
+# recipe names those passes. Hyperparameters only: the adapters, the questions, the
+# graph and the output directory come from --graph, --size and --tag
+# (graph_reasoner.recipe). The released 4B's full round sampled at 512 tokens a
+# turn, which its manifest records; every round trains at 1,024.
+chat_template: plain_chatml
+tiers: [medium, hard]
+informative_band:
+  lo: 0.05
+  hi: 0.95
+is_ratio_clip: 2.0
+
+partial_on: evidence_recall
+partial_credit: 0.25
+
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+num_generations: 16
+batch_size: 1
+grad_accum: 64
+lr: 3.0e-5
+warmup_ratio: 0.03
+scale_rewards: group
+kl_beta: 0.015
+temperature: 0.9
+top_p: 0.95
+max_steps: 120
+save_steps: 20
+save_total_limit: 0
+logging_steps: 1
+seed: 0
+env_seed: 0
+
+max_turns: 20
+turn_max_tokens: 1024   # tokens per turn, the budget the policy is evaluated at
+max_seq_len: 16384
+gradient_checkpointing: true
+
+# Settings that fit the trainer and the sampling engine on one card (launch/README.md).
+model_dtype: bfloat16
+vllm_sleep: true
+logps_chunk: 512
+vllm_gpu_frac: 0.35
+vllm_max_num_seqs: 64

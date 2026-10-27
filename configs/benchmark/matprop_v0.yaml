@@ -1,0 +1,50 @@
+# Benchmark build for MatProp_KG, the materials-properties graph released
+# with GraphAgents: the generator and tiers of tsmc_v0.yaml, with
+# `gold_leak_filter` on for its free-text relations.
+
+kg_path: data/raw/matprop/MatProp_KG.graphml
+substrate: matprop       # backend and teacher persona (substrates/matprop/)
+seed: 20260909
+output: data/benchmarks/matprop/matprop_v0.jsonl
+
+teacher_model: gpt-5-mini
+
+# Nodes above this degree never enter a gold path.
+max_node_degree: 150
+
+# Keeps an edge off gold paths when its relation text contains an endpoint's
+# name, which would give the next hop away (kg/sample.py).
+gold_leak_filter: true
+
+# `biblio_types` is left out, so the defaults of kg/load.py apply.
+
+gold_relation_blocklist: [authored, authored_by, author_of, published in,
+                          published_in, illustrates, illustrated in, shows,
+                          cited, cites, related to, related_to, is related to,
+                          abbreviation_of]
+
+tiers:
+  easy:
+    n_items: 100
+    path_len: 2
+    branch_per_node: 1
+    branch_depth: 1
+    decoy_walks: 0
+    decoy_len: 0
+    biblio_attach: 0
+  medium:
+    n_items: 100
+    path_len: 3
+    branch_per_node: 2
+    branch_depth: 2
+    decoy_walks: 2
+    decoy_len: 3
+    biblio_attach: 2
+  hard:
+    n_items: 100
+    path_len: 4
+    branch_per_node: 3
+    branch_depth: 3
+    decoy_walks: 4
+    decoy_len: 4
+    biblio_attach: 4

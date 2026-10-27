@@ -1,0 +1,60 @@
+# Benchmark build for the semiconductor graph: tiered questions, each over a
+# gold path that is the only simple path between its endpoints in the item's
+# subgraph (kg/sample.py). A tier sets the path length and the noise around
+# it. Run by scripts/bench/build_benchmark.py, which calls `teacher_model` and
+# spends API credit unless --offline. The shipped semiconductor questions
+# were sampled by an earlier version of the sampler and do not regenerate
+# from this seed (data/benchmarks/README.md); the three transfer configs' do.
+
+kg_path: data/raw/GRAPHDATA_TSMC_OUTPUT/tsmc_5b10p.graphml
+substrate: tsmc          # backend and teacher persona (substrates/tsmc/)
+seed: 20260730
+output: data/benchmarks/tsmc/tsmc_v0.jsonl
+
+teacher_model: gpt-5-mini
+
+# Nodes above this degree never enter a gold path. The default, and the
+# value here, is the tools' hub threshold (ToolConfig.hub_threshold).
+max_node_degree: 150
+
+# Node types treated as bibliographic: noise only, never on a gold path.
+# These are the defaults of kg/load.py.
+biblio_types: [author, image, figure, table, reference, publication, journal,
+               conference, person, email, location, organization]
+
+biblio_name_patterns:
+  - '^(fig|figs|figure|table|eq|eqs|equation)[\s.~(]'
+  - '\(\d{4}\)$'
+  - '@'
+
+# Relations never allowed on a gold path; their edges remain as noise.
+gold_relation_blocklist: [authored, authored_by, author_of, published in,
+                          published_in, illustrates, illustrated in, shows,
+                          cited, cites, related to, related_to, is related to,
+                          abbreviation_of]
+
+tiers:
+  easy:    # 2 hops, light local noise
+    n_items: 100
+    path_len: 2
+    branch_per_node: 1
+    branch_depth: 1
+    decoy_walks: 0
+    decoy_len: 0
+    biblio_attach: 0
+  medium:  # 3 hops, branches, decoys and some bibliographic noise
+    n_items: 100
+    path_len: 3
+    branch_per_node: 2
+    branch_depth: 2
+    decoy_walks: 2
+    decoy_len: 3
+    biblio_attach: 2
+  hard:    # 4 hops, dense noise, long decoys, more bibliographic noise
+    n_items: 100
+    path_len: 4
+    branch_per_node: 3
+    branch_depth: 3
+    decoy_walks: 4
+    decoy_len: 4
+    biblio_attach: 4

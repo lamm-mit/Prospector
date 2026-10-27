@@ -1,0 +1,33 @@
+# The verifier: LoRA SFT from the base model on yes/no rows built from the served
+# policy's own four sampled passes over the training questions, labelled by
+# gated_acc with the evaluation questions excluded (`prospector run` builds the
+# rows in its `rows` stage). Hyperparameters only. batch_size 8 x grad_accum 4: effective batch 32.
+chat_template: plain_chatml
+
+matmul_precision: high
+
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+  - in_proj_qkv
+  - in_proj_z
+  - out_proj
+
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+model_dtype: float32
+epochs: 2
+batch_size: 8
+grad_accum: 4
+lr: 1.0e-4
+max_length: 1024   # tokens; a longer row is dropped, not truncated
+logging_steps: 10
+save_strategy: steps
+save_steps: 200
+seed: 0

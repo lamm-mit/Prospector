@@ -1,0 +1,34 @@
+{
+  "schema": "provenance_v1",
+  "tool": "scripts/traj/build_substrate_mix.py",
+  "git": {
+    "sha": "2cc3060da9649d399b53fd9a759caa8a6bb7af95",
+    "branch": "cleanup/v0.2.0",
+    "dirty": false
+  },
+  "argv": [
+    "--keeps",
+    "data/traj/tsmc_flash20_keeps.jsonl",
+    "--detours",
+    "data/traj/tsmc_error_pairs_flash20.jsonl",
+    "--out",
+    "data/traj/tsmc_sft_mix_flash20.jsonl"
+  ],
+  "components": {
+    "keeps": {
+      "path": "data/traj/tsmc_flash20_keeps.jsonl",
+      "rows": 37105
+    },
+    "detours": {
+      "path": "data/traj/tsmc_error_pairs_flash20.jsonl",
+      "rows_used": 2590
+    }
+  },
+  "shares": {
+    "google/gemini-3.7-flash": 0.9348,
+    "error_pair": 0.0652
+  },
+  "ec_share_target": 0.08,
+  "seed": 0,
+  "rows_total": 39695
+}

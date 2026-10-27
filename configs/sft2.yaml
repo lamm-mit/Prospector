@@ -1,0 +1,32 @@
+# Stage 3: LoRA SFT from the base model on the demonstrations blended with the
+# stage-2 policy's own verified episodes. Hyperparameters only; the same settings
+# as stage 1 (configs/sft1.yaml), in a file of its own so the stages can diverge.
+chat_template: plain_chatml
+
+matmul_precision: high
+
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+  - in_proj_qkv
+  - in_proj_z
+  - out_proj
+
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+model_dtype: float32
+epochs: 3
+batch_size: 1
+grad_accum: 32
+lr: 1.0e-4
+max_length: 12288
+logging_steps: 10
+save_strategy: steps
+save_steps: 50
+seed: 0

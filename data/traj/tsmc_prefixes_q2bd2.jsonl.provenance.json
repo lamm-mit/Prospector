@@ -1,0 +1,102 @@
+{
+  "schema": "provenance_v1",
+  "tool": "scripts/traj/build_prefixes.py",
+  "git": {
+    "sha": "6c03e597288e9e21bc5fbaf2301520e79475cc01",
+    "branch": "cleanup/v0.2.0",
+    "dirty": false
+  },
+  "argv": [
+    "--rollouts",
+    "data/runs/q2bd2roll-s831--tsmc_train_agentic_4x",
+    "--rollouts",
+    "data/runs/q2bd2roll-s832--tsmc_train_agentic_4x",
+    "--rollouts",
+    "data/runs/q2bd2roll-s833--tsmc_train_agentic_4x",
+    "--rollouts",
+    "data/runs/q2bd2roll-s834--tsmc_train_agentic_4x",
+    "--exclude",
+    "data/benchmarks/tsmc/tsmc_core_agentic.jsonl",
+    "--kb",
+    "data/raw/GRAPHDATA_TSMC_OUTPUT/tsmc_5b10p.graphml",
+    "--success-share",
+    "0.25",
+    "--seed",
+    "7",
+    "--out",
+    "data/traj/tsmc_prefixes_q2bd2.jsonl"
+  ],
+  "source_runs": [
+    {
+      "run": "q2bd2roll-s831--tsmc_train_agentic_4x",
+      "path": "data/runs/q2bd2roll-s831--tsmc_train_agentic_4x",
+      "model": "vllm:Qwen/Qwen3.5-2B",
+      "adapter": "models/traj_sft_2b_flash20g2/final,models/traj_grpo_2b_flash20d1/checkpoint-100",
+      "backend": "tsmc",
+      "chat_template": "plain_chatml",
+      "kg_fingerprint": "ba22334639149e9d",
+      "benchmark": "data/benchmarks/tsmc/tsmc_train_agentic_4x.jsonl",
+      "max_turns": 20,
+      "relation_vocab": true,
+      "temperature": 0.7,
+      "driver": "batched"
+    },
+    {
+      "run": "q2bd2roll-s832--tsmc_train_agentic_4x",
+      "path": "data/runs/q2bd2roll-s832--tsmc_train_agentic_4x",
+      "model": "vllm:Qwen/Qwen3.5-2B",
+      "adapter": "models/traj_sft_2b_flash20g2/final,models/traj_grpo_2b_flash20d1/checkpoint-100",
+      "backend": "tsmc",
+      "chat_template": "plain_chatml",
+      "kg_fingerprint": "ba22334639149e9d",
+      "benchmark": "data/benchmarks/tsmc/tsmc_train_agentic_4x.jsonl",
+      "max_turns": 20,
+      "relation_vocab": true,
+      "temperature": 0.7,
+      "driver": "batched"
+    },
+    {
+      "run": "q2bd2roll-s833--tsmc_train_agentic_4x",
+      "path": "data/runs/q2bd2roll-s833--tsmc_train_agentic_4x",
+      "model": "vllm:Qwen/Qwen3.5-2B",
+      "adapter": "models/traj_sft_2b_flash20g2/final,models/traj_grpo_2b_flash20d1/checkpoint-100",
+      "backend": "tsmc",
+      "chat_template": "plain_chatml",
+      "kg_fingerprint": "ba22334639149e9d",
+      "benchmark": "data/benchmarks/tsmc/tsmc_train_agentic_4x.jsonl",
+      "max_turns": 20,
+      "relation_vocab": true,
+      "temperature": 0.7,
+      "driver": "batched"
+    },
+    {
+      "run": "q2bd2roll-s834--tsmc_train_agentic_4x",
+      "path": "data/runs/q2bd2roll-s834--tsmc_train_agentic_4x",
+      "model": "vllm:Qwen/Qwen3.5-2B",
+      "adapter": "models/traj_sft_2b_flash20g2/final,models/traj_grpo_2b_flash20d1/checkpoint-100",
+      "backend": "tsmc",
+      "chat_template": "plain_chatml",
+      "kg_fingerprint": "ba22334639149e9d",
+      "benchmark": "data/benchmarks/tsmc/tsmc_train_agentic_4x.jsonl",
+      "max_turns": 20,
+      "relation_vocab": true,
+      "temperature": 0.7,
+      "driver": "batched"
+    }
+  ],
+  "teacher": "vllm:Qwen/Qwen3.5-2B",
+  "kb": "data/raw/GRAPHDATA_TSMC_OUTPUT/tsmc_5b10p.graphml",
+  "success_share": 0.25,
+  "max_chars": 48000,
+  "exclude": [
+    "data/benchmarks/tsmc/tsmc_core_agentic.jsonl"
+  ],
+  "counts": {
+    "episodes": 15884,
+    "success not sampled": 8866,
+    "kept success": 2990,
+    "kept fixable": 1969,
+    "kept search": 1665,
+    "dropped: failed, never adjacent to gold": 394
+  }
+}

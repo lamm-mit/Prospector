@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Prospector</title>
+<link rel="icon" href="/static/prospector-mark.svg">
+<link rel="stylesheet" href="/static/style.css?v=10">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img class="mark" src="/static/prospector-mark.svg" alt="Prospector">
+    <span class="wordmark">Prospector</span>
+    <span class="modes">
+      <button class="mode-btn" data-mode="live" title="the served model, on this machine, right now">Live</button>
+      <button class="mode-btn" data-mode="replay" title="stored trajectories from data/runs">Replay</button>
+    </span>
+    <button id="btn-about" class="about-btn" title="How Prospector works" aria-haspopup="dialog">?</button>
+  </div>
+  <div class="pickers hidden" id="live-controls">
+    <div class="ask">
+      <input id="q-input" list="q-list" autocomplete="off" spellcheck="false" placeholder="Ask the graph…">
+      <datalist id="q-list"></datalist>
+      <label class="budget" title="Tool calls announced to the policy. 20 is the budget it was trained and scored at; another number is a different policy, and the record says which. Above 20 the seen-edge cap scales with it (20 edges per call) so the search is not cut short by a limit the policy never sees."><span>budget</span><input id="budget" type="number" min="1" max="200" step="1" value="20"></label>
+      <button id="btn-ask" title="run one episode (Enter)">Ask</button>
+    </div>
+  </div>
+  <div class="pickers hidden" id="replay-controls">
+    <label class="picker"><span>run</span><select id="run-select"></select></label>
+    <label class="picker"><span>item</span><select id="item-select"></select></label>
+  </div>
+  <img class="lockup" src="/static/lamm-mit.svg" alt="Laboratory for Atomistic and Molecular Mechanics · MIT">
+</header>
+<div id="meta-bar">
+  <span id="meta-text" title=""></span>
+  <span class="meta-right">
+    <span id="check-badge" class="badge hidden" title=""></span>
+    <button id="live-pill" class="pill hidden" title=""></button>
+  </span>
+</div>
+
+<div id="about" class="hidden" role="dialog" aria-label="How Prospector works">
+  <div class="about-title">How Prospector works</div>
+  <p>Prospector answers a question by exploring a knowledge graph with three tools, one call at a time, and every answer must cite edges the tools returned.</p>
+  <dl>
+    <dt class="t-find">find(name)</dt><dd>up to ten nodes whose name matches, with type and connection count. Returns no edges.</dd>
+    <dt class="t-expand">expand(node, relation?, offset?)</dt><dd>the edges at a node in either direction, forty per page. A node with more than 150 connections returns a relation summary plus its forty most-connected edges.</dd>
+    <dt class="t-connect">connect(a, b, max_hops?)</dt><dd>up to three shortest paths between two nodes, as edges, three hops at most.</dd>
+  </dl>
+  <p><b>Seen</b> means a tool returned it. The final answer is checked by set membership, never by a judge: it must cite at least one edge, every cited edge must have been seen, and the answer must name a node of a cited edge. Anything else is shown as an abstention with its reason. A benchmark question is also compared to its gold answer.</p>
+  <p class="about-colours"><i class="sw sw-cited"></i>evidence, cited <i class="sw sw-seen"></i>seen <i class="sw sw-new"></i>find, and new this turn <i class="sw sw-connect"></i>connect <i class="sw sw-answer"></i>answer <i class="sw sw-halluc"></i>cited but never seen</p>
+  <p class="about-foot">Prospector is Qwen3.5 after supervised fine-tuning and reinforcement learning on its own traversals, served on this machine, with MLX on a Mac or vLLM on a GPU; the status strip names the size and the driver. The budget is the number of tool calls it is told it has; it was trained at 20.</p>
+</div>
+
+<main>
+  <section id="transcript-pane">
+    <div id="transcript"></div>
+    <button id="latest" class="hidden">↓ latest</button>
+  </section>
+  <section id="graph-pane">
+    <div id="cy"></div>
+    <button id="btn-fit" title="reframe: follow the traverse ↔ whole map">⛶</button>
+    <div id="tip" class="hidden"></div>
+    <div id="loading" class="hidden"><div class="spin"></div><span id="loading-text">loading…</span></div>
+    <div id="legend">
+      <div class="legend-title">Legend</div>
+      <span><i class="sw sw-new"></i>new this turn</span>
+      <span><i class="sw sw-seen"></i>seen</span>
+      <span><i class="sw sw-cited"></i>cited ⊆ seen</span>
+      <span><i class="sw sw-halluc"></i>cited, never seen</span>
+      <span><i class="sw sw-gold"></i>gold path</span>
+      <span><i class="sw sw-backbone"></i>backbone, numbered by call</span>
+      <span><i class="sw sw-route"></i>route in visit order</span>
+      <span><i class="sw sw-anchor"></i>anchor</span>
+      <span><i class="sw sw-answer"></i>answer</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="ctl">
+    <button id="btn-reset" title="restart">⏮</button>
+    <button id="btn-prev" title="previous (←)">◀</button>
+    <button id="btn-play" title="play (space)">▶</button>
+    <button id="btn-next" title="next (→)">▶|</button>
+  </div>
+  <div id="scrub-seg" title=""></div>
+  <span id="step-label">–</span>
+</footer>
+
+<script src="/static/vendor/cytoscape.min.js"></script>
+<script src="/static/app.js?v=10"></script>
+</body>
+</html>

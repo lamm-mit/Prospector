@@ -1,0 +1,45 @@
+# Stage 4, either decision round: GRPO that resumes the policy's stored decision
+# states on top of the previous stage's adapters, with loss on the continuation
+# only. `prefix_band` keeps a state whose eight stored continuations pass 5% to 95%
+# of the time; the recipe names the band. Hyperparameters only: round 2 differs
+# from round 1 in the adapters it continues from, which the recipe derives from
+# round 1's pick.
+chat_template: plain_chatml
+
+prefix_band:
+  lo: 0.05
+  hi: 0.95
+
+is_ratio_clip: 2.0
+partial_on: evidence_recall
+partial_credit: 0.25
+
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+num_generations: 16
+batch_size: 1
+grad_accum: 64
+lr: 1.5e-5
+warmup_ratio: 0.03
+scale_rewards: group
+kl_beta: 0.015
+temperature: 0.9
+top_p: 0.95
+max_steps: 120       # the cosine schedule's length; a checkpoint every save_steps
+save_steps: 20
+save_total_limit: 0
+logging_steps: 1
+seed: 0
+env_seed: 0
+
+max_turns: 20
+turn_max_tokens: 1024
+max_seq_len: 16384
+
+gradient_checkpointing: true
+model_dtype: bfloat16
+vllm_sleep: true
+logps_chunk: 512      # positions per logits slice; 0 computes the full logits at once
+vllm_gpu_frac: 0.35
+vllm_max_num_seqs: 64

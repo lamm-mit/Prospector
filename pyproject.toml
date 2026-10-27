@@ -1,0 +1,101 @@
+[project]
+name = "graph-reasoner"
+dynamic = ["version"]
+description = "Prospector: a compact graph-traversal policy for scientific reasoning"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{name = "Haiqian Yang"}, {name = "Markus J. Buehler"}]
+requires-python = ">=3.10"
+dependencies = [
+    "networkx>=3.2",
+    "openai>=1.50",
+    "python-dotenv>=1.0",
+    "pydantic>=2.7",
+    "numpy>=1.26",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+    "tenacity>=9.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+# The app (app/): replays stored trajectories in the browser.
+app = ["fastapi>=0.110", "uvicorn>=0.29", "python-igraph>=0.11"]
+# The training stack: SFT, the verifier and the `hf:` driver. GRPO and the
+# `vllm:` driver also need the `rl` extra. On a Linux CUDA machine
+# launch/setup.sh installs both extras and the app's into .venv, with Qwen3.5's
+# two compiled kernels (flash-linear-attention, causal-conv1d), against
+# launch/constraints-gpu.txt.
+train = [
+    "torch>=2.6",
+    "requests",  # imported by trl's trainer; nothing else in this extra pulls it in
+    # Bounded at both ends. Before 5.3 `qwen3_5` is not a known architecture
+    # and no Qwen3.5 model loads. 5.14 is the last version the training stack
+    # was run on; raise the ceiling after the torch-gated tests pass on a
+    # newer one.
+    "transformers>=5.3,<5.15",
+    # Bounded at both ends. train/grpo.py depends on TRL internals: it refuses
+    # a TRL whose rollout_func path does not pop `env_mask` (checked in the
+    # installed source at launch), and ParityGRPOTrainer overrides the private
+    # `_get_per_token_logps_and_entropies` and `_compute_loss`, whose arguments
+    # vary by version. Raise the ceiling only after that check and the
+    # torch-gated tests pass on the newer version.
+    "trl>=1.10,<1.13",
+    # The released adapters were saved by peft 0.18.1 and 0.20.0.
+    "peft>=0.18",
+    "datasets>=3.0",
+    "accelerate>=1.0",
+    "safetensors>=0.4",   # the adapter-load guard reads adapter tensors by name
+]
+# vLLM, the engine of GRPO's rollouts and of the `vllm:` driver, installed
+# into .venv on a CUDA machine. tiktoken and sentencepiece are transformers'
+# tokenizer-conversion fallbacks.
+rl = ["vllm==0.27.1; sys_platform == 'linux'", "tiktoken", "sentencepiece"]
+# mlx-lm, the engine of the `mlx:` driver and of the live app (.venv-mac on
+# Apple silicon); merging an adapter chain needs the train extra beside it.
+mlx = ["mlx-lm>=0.31,<0.32; sys_platform == 'darwin' and platform_machine == 'arm64'"]
+
+[project.scripts]
+# The recipe's command line: the teacher pass, the plan and the run of the four
+# stages and the selection, a stage's smoke, the machine check, the probe.
+prospector = "graph_reasoner.recipe.cli:main"
+
+[project.urls]
+Code = "https://github.com/lamm-mit/Prospector"
+Models = "https://huggingface.co/lamm-mit/Prospector"
+
+[tool.ruff.lint]
+# ruff's historical default rules (pyflakes and the E4/E7/E9 subset of
+# pycodestyle), less three the code uses on purpose: `l` as the name of a line
+# being read (E741), two short statements on one line (E702) and a lambda
+# bound to a name where a `def` would say less (E731).
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E741", "E702", "E731"]
+
+[tool.ruff.lint.per-file-ignores]
+# The torch imports follow pytest.importorskip("torch"), which must run first.
+"tests/test_parity_loss.py" = ["E402"]
+
+[tool.pytest.ini_options]
+# -ra prints the reason for every skip, so a test file skipped for a missing
+# torch or tokenizer is visible.
+addopts = "-ra"
+testpaths = ["tests"]
+# The repository root is on the path because the tests import app/, which is
+# not an installed package.
+pythonpath = [".", "src"]
+markers = ["slow: parses a release graph (seconds each); -m \"not slow\" skips them"]
+# The adapter-guard tests save a toy model that has no config file, and peft
+# warns on every save.
+filterwarnings = ["ignore:Could not find a config file:UserWarning:peft"]
+
+[build-system]
+requires = ["setuptools>=77"]   # PEP 639 licence metadata
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "graph_reasoner.__version__"}
